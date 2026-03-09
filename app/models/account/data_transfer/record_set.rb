@@ -4,6 +4,41 @@ class Account::DataTransfer::RecordSet
 
   IMPORT_BATCH_SIZE = 100
 
+  IMPORTABLE_MODEL_NAMES = %w[
+    Access
+    Account
+    ActionText::RichText
+    ActiveStorage::Attachment
+    ActiveStorage::Blob
+    Assignment
+    Board
+    Board::Publication
+    Card
+    Card::ActivitySpike
+    Card::Goldness
+    Card::NotNow
+    Closure
+    Column
+    Comment
+    Entropy
+    Event
+    Filter
+    Mention
+    Notification
+    Notification::Bundle
+    Pin
+    Reaction
+    Step
+    Tag
+    Tagging
+    User
+    User::Settings
+    Watch
+    Webhook
+    Webhook::DelinquencyTracker
+    Webhook::Delivery
+  ].freeze
+
   attr_reader :account, :model, :attributes
 
   def initialize(account:, model:, attributes: nil)
@@ -113,13 +148,21 @@ class Account::DataTransfer::RecordSet
     def check_association_doesnt_exist(data, association, associated_id)
       if association.polymorphic?
         type_column = association.foreign_type.to_s
-        associated_class = data[type_column].constantize
+        associated_class = verify_model_type(data[type_column])
       else
         associated_class = association.klass
       end
 
       if associated_class.exists?(id: associated_id)
         raise ConflictError, "#{model} record references existing #{association.name} (#{associated_class}) with ID #{associated_id}"
+      end
+    end
+
+    def verify_model_type(type_name)
+      if IMPORTABLE_MODEL_NAMES.include?(type_name)
+        type_name.constantize
+      else
+        raise IntegrityError, "Unrecognized model type: #{type_name}"
       end
     end
 
