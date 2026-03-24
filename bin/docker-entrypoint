@@ -3,6 +3,22 @@
 # If running the rails server then create or migrate existing database
 if [ "${1}" == "./bin/thrust" ] && [ "${2}" == "./bin/rails" ] && [ "${3}" == "server" ]; then
   MIGRATE=1 ./bin/rails db:prepare
+
+  # All databases share one PostgreSQL URL, so db:prepare only migrates the primary DB.
+  # Load secondary schemas on first boot if their tables don't exist yet.
+  ./bin/rails runner "
+    conn = ActiveRecord::Base.connection
+    [
+      ['solid_queue_jobs',     'db:schema:load:queue'],
+      ['solid_cable_messages', 'db:schema:load:cable'],
+      ['solid_cache_entries',  'db:schema:load:cache'],
+    ].each do |table, task|
+      unless conn.table_exists?(table)
+        puts \"Loading schema for \#{task}...\"
+        system(\"bin/rails \#{task}\") or abort(\"Failed to load \#{task}\")
+      end
+    end
+  "
 fi
 
 exec "${@}"
