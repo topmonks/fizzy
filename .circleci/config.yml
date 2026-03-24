@@ -100,7 +100,7 @@ jobs:
           name: Deploy to ECS
           command: |
             aws ecs update-service \
-              --cluster fizzy \
+              --cluster fizzy-ticketing \
               --service fizzy-service \
               --task-definition fizzy-task \
               --force-new-deployment \
