@@ -41,31 +41,5 @@ module ActiveRecord
   end
 end
 
-# PostgreSQL UUID type: converts base36 strings ↔ standard UUID format for storage
-# PostgreSQL's native uuid column type requires standard "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" format
-class ActiveRecord::Type::PostgreSQLUuid < ActiveRecord::Type::Value
-  def type
-    :uuid
-  end
-
-  def cast(value)
-    return unless value
-    value.to_s
-  end
-
-  def serialize(value)
-    return unless value
-    hex = ActiveRecord::Type::Uuid.base36_to_hex(value.to_s)
-    "#{hex[0..7]}-#{hex[8..11]}-#{hex[12..15]}-#{hex[16..19]}-#{hex[20..31]}"
-  end
-
-  def deserialize(value)
-    return unless value
-    hex = value.to_s.delete("-")
-    ActiveRecord::Type::Uuid.hex_to_base36(hex)
-  end
-end
-
-# Register the UUID type for Trilogy (MySQL), SQLite3, and PostgreSQL adapters
 ActiveRecord::Type.register(:uuid, ActiveRecord::Type::Uuid, adapter: :trilogy)
 ActiveRecord::Type.register(:uuid, ActiveRecord::Type::Uuid, adapter: :sqlite3)

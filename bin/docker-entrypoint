@@ -4,20 +4,24 @@
 if [ "${1}" == "./bin/thrust" ] && [ "${2}" == "./bin/rails" ] && [ "${3}" == "server" ]; then
   MIGRATE=1 ./bin/rails db:prepare
 
-  # All databases share one PostgreSQL URL, so db:prepare only migrates the primary DB.
-  # Load secondary schemas on first boot if their tables don't exist yet.
+  # Load secondary DB schemas on first boot if their tables don't exist yet.
+  # Each secondary database has its own connection, so we switch to it before checking.
   ./bin/rails runner "
-    conn = ActiveRecord::Base.connection
     {
-      'solid_queue_jobs'     => 'db/queue_schema.rb',
-      'solid_cable_messages' => 'db/cable_schema.rb',
-      'solid_cache_entries'  => 'db/cache_schema.rb',
-    }.each do |table, schema_path|
-      unless conn.table_exists?(table)
-        puts \"Loading \#{schema_path}...\"
-        load Rails.root.join(schema_path)
+      'queue' => ['solid_queue_jobs',     'db/queue_schema.rb'],
+      'cable' => ['solid_cable_messages', 'db/cable_schema.rb'],
+      'cache' => ['solid_cache_entries',  'db/cache_schema.rb'],
+    }.each do |db_key, (table, schema_path)|
+      config = ActiveRecord::Base.configurations.find_db_config(db_key)
+      if config
+        ActiveRecord::Base.establish_connection(config)
+        unless ActiveRecord::Base.connection.table_exists?(table)
+          puts \"Loading \#{schema_path}...\"
+          load Rails.root.join(schema_path)
+        end
       end
     end
+    ActiveRecord::Base.establish_connection(:primary)
   "
 fi
 
