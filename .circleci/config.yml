@@ -20,7 +20,9 @@ jobs:
             - gems-v1-
       - run:
           name: Install gems
-          command: bundle install --path vendor/bundle
+          command: |
+            bundle config set --local path vendor/bundle
+            bundle install
       - save_cache:
           key: gems-v1-{{ checksum "Gemfile.lock" }}
           paths:
