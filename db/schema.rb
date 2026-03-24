@@ -302,7 +302,7 @@ ActiveRecord::Schema[8.2].define(version: 2026_02_18_120000) do
     t.uuid "creator_id", null: false
     t.uuid "eventable_id", null: false
     t.string "eventable_type", null: false
-    t.json "particulars", default: -> { "(json_object())" }
+    t.json "particulars", default: {}
     t.datetime "updated_at", null: false
     t.index ["account_id", "action"], name: "index_events_on_account_id_and_action"
     t.index ["board_id", "action", "created_at"], name: "index_events_on_board_id_and_action_and_created_at"
@@ -328,7 +328,7 @@ ActiveRecord::Schema[8.2].define(version: 2026_02_18_120000) do
     t.uuid "account_id", null: false
     t.datetime "created_at", null: false
     t.uuid "creator_id", null: false
-    t.json "fields", default: -> { "(json_object())" }, null: false
+    t.json "fields", default: {}, null: false
     t.string "params_digest", null: false
     t.datetime "updated_at", null: false
     t.index ["account_id"], name: "index_filters_on_account_id"
@@ -441,7 +441,7 @@ ActiveRecord::Schema[8.2].define(version: 2026_02_18_120000) do
     t.string "user_agent", limit: 4096
     t.uuid "user_id", null: false
     t.index ["account_id"], name: "index_push_subscriptions_on_account_id"
-    t.index ["user_id", "endpoint"], name: "index_push_subscriptions_on_user_id_and_endpoint", unique: true, length: { endpoint: 255 }
+    t.index ["user_id", "endpoint"], name: "index_push_subscriptions_on_user_id_and_endpoint", unique: true
   end
 
   create_table "reactions", id: :uuid, charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
@@ -464,7 +464,7 @@ ActiveRecord::Schema[8.2].define(version: 2026_02_18_120000) do
     t.datetime "updated_at", null: false
     t.uuid "user_id", null: false
     t.index ["account_id"], name: "index_search_queries_on_account_id"
-    t.index ["user_id", "terms"], name: "index_search_queries_on_user_id_and_terms", length: { terms: 255 }
+    t.index ["user_id", "terms"], name: "index_search_queries_on_user_id_and_terms"
     t.index ["user_id", "updated_at"], name: "index_search_queries_on_user_id_and_updated_at", unique: true
     t.index ["user_id"], name: "index_search_queries_on_user_id"
   end
@@ -854,6 +854,6 @@ ActiveRecord::Schema[8.2].define(version: 2026_02_18_120000) do
     t.datetime "updated_at", null: false
     t.text "url", null: false
     t.index ["account_id"], name: "index_webhooks_on_account_id"
-    t.index ["board_id", "subscribed_actions"], name: "index_webhooks_on_board_id_and_subscribed_actions", length: { subscribed_actions: 255 }
+    t.index ["board_id", "subscribed_actions"], name: "index_webhooks_on_board_id_and_subscribed_actions"
   end
 end
