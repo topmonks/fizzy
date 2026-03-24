@@ -64,6 +64,11 @@
           "awslogs-stream-prefix": "fizzy"
         }
       },
+      "linuxParameters": {
+        "capabilities": {
+          "add": ["NET_BIND_SERVICE"]
+        }
+      },
       "healthCheck": {
         "command": ["CMD-SHELL", "wget -q --spider http://localhost/up || exit 1"],
         "interval": 30,
