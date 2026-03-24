@@ -1,0 +1,104 @@
+version: 2.1
+
+orbs:
+  aws-cli: circleci/aws-cli@4.1
+
+jobs:
+  test:
+    docker:
+      - image: cimg/ruby:3.4
+    environment:
+      RAILS_ENV: test
+      DATABASE_ADAPTER: sqlite
+      BUNDLE_JOBS: "4"
+      BUNDLE_RETRY: "3"
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - gems-v1-{{ checksum "Gemfile.lock" }}
+            - gems-v1-
+      - run:
+          name: Install gems
+          command: bundle install --path vendor/bundle
+      - save_cache:
+          key: gems-v1-{{ checksum "Gemfile.lock" }}
+          paths:
+            - vendor/bundle
+      - run:
+          name: Run CI suite
+          command: bin/ci
+
+  build-and-push:
+    docker:
+      - image: cimg/base:current
+    steps:
+      - checkout
+      - setup_remote_docker:
+          docker_layer_caching: true
+      - run:
+          name: Build and push Docker image
+          command: |
+            echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+
+            docker build \
+              -t topmonkscom/fizzy:latest-${CIRCLE_BRANCH} \
+              -t topmonkscom/fizzy:build-${CIRCLE_BUILD_NUM} \
+              --build-arg OCI_SOURCE="https://github.com/basecamp/fizzy" \
+              --build-arg OCI_DESCRIPTION="Fizzy build ${CIRCLE_BUILD_NUM}" \
+              .
+
+            docker push topmonkscom/fizzy:latest-${CIRCLE_BRANCH}
+            docker push topmonkscom/fizzy:build-${CIRCLE_BUILD_NUM}
+
+  deploy-ecs:
+    executor: aws-cli/default
+    steps:
+      - checkout
+      - aws-cli/setup
+      - run:
+          name: Register task definition if changed
+          command: |
+            if git diff --quiet HEAD~1 HEAD -- ecs/fizzy.taskdef.json; then
+              echo "Task definition unchanged, skipping registration..."
+            else
+              echo "Task definition changed, registering new revision..."
+              aws ecs register-task-definition \
+                --cli-input-json file://ecs/fizzy.taskdef.json \
+                --region eu-central-1
+            fi
+      - run:
+          name: Deploy to ECS
+          command: |
+            aws ecs update-service \
+              --cluster fizzy \
+              --service fizzy-service \
+              --task-definition fizzy-task \
+              --force-new-deployment \
+              --region eu-central-1
+
+workflows:
+  version: 2
+  build-test-deploy:
+    jobs:
+      - test
+      - build-and-push:
+          requires:
+            - test
+          filters:
+            branches:
+              only:
+                - main
+          context:
+            - org-docker
+      - deploy-ecs:
+          requires:
+            - test
+            - build-and-push
+          filters:
+            branches:
+              only:
+                - main
+          context:
+            - org-global
+            - org-aws

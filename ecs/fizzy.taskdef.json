@@ -1,0 +1,79 @@
+{
+  "family": "fizzy-task",
+  "networkMode": "awsvpc",
+  "requiresCompatibilities": ["FARGATE", "EC2"],
+  "cpu": "1024",
+  "memory": "2048",
+  "executionRoleArn": "arn:aws:iam::661884430919:role/ecsTaskExecutionRole",
+  "taskRoleArn": "arn:aws:iam::661884430919:role/ecsTaskExecutionRole",
+  "containerDefinitions": [
+    {
+      "name": "fizzy",
+      "image": "topmonkscom/fizzy:latest-main",
+      "repositoryCredentials": {
+        "credentialsParameter": "arn:aws:secretsmanager:eu-central-1:661884430919:secret:docker-registry/credentials-8iCvzW"
+      },
+      "cpu": 1024,
+      "memory": 2048,
+      "memoryReservation": 1536,
+      "essential": true,
+      "portMappings": [
+        {
+          "containerPort": 80,
+          "hostPort": 80,
+          "protocol": "tcp"
+        }
+      ],
+      "environment": [
+        { "name": "RAILS_ENV",              "value": "production" },
+        { "name": "DATABASE_ADAPTER",       "value": "postgres" },
+        { "name": "RAILS_LOG_TO_STDOUT",    "value": "true" },
+        { "name": "RAILS_SERVE_STATIC_FILES", "value": "true" },
+        { "name": "SOLID_QUEUE_IN_PUMA",    "value": "true" },
+        { "name": "MULTI_TENANT",           "value": "false" },
+        { "name": "BASE_URL",               "value": "https://fizzy.topmonks.com" },
+        { "name": "MAILER_FROM_ADDRESS",    "value": "support@topmonks.com" },
+        { "name": "SMTP_ADDRESS",           "value": "email-smtp.eu-central-1.amazonaws.com" },
+        { "name": "SMTP_PORT",              "value": "587" }
+      ],
+      "secrets": [
+        {
+          "name": "DATABASE_URL",
+          "valueFrom": "arn:aws:secretsmanager:eu-central-1:661884430919:secret:prod/fizzy:DATABASE_URL::"
+        },
+        {
+          "name": "RAILS_MASTER_KEY",
+          "valueFrom": "arn:aws:secretsmanager:eu-central-1:661884430919:secret:prod/fizzy:RAILS_MASTER_KEY::"
+        },
+        {
+          "name": "SECRET_KEY_BASE",
+          "valueFrom": "arn:aws:secretsmanager:eu-central-1:661884430919:secret:prod/fizzy:SECRET_KEY_BASE::"
+        },
+        {
+          "name": "SMTP_USERNAME",
+          "valueFrom": "arn:aws:secretsmanager:eu-central-1:661884430919:secret:prod/fizzy:SMTP_USERNAME::"
+        },
+        {
+          "name": "SMTP_PASSWORD",
+          "valueFrom": "arn:aws:secretsmanager:eu-central-1:661884430919:secret:prod/fizzy:SMTP_PASSWORD::"
+        }
+      ],
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/fizzy",
+          "awslogs-region": "eu-central-1",
+          "awslogs-create-group": "true",
+          "awslogs-stream-prefix": "fizzy"
+        }
+      },
+      "healthCheck": {
+        "command": ["CMD-SHELL", "wget -q --spider http://localhost/up || exit 1"],
+        "interval": 30,
+        "timeout": 5,
+        "retries": 3,
+        "startPeriod": 90
+      }
+    }
+  ]
+}
