@@ -85,23 +85,18 @@ jobs:
       - checkout
       - aws-cli/setup
       - run:
-          name: Register task definition if changed
+          name: Register task definition and deploy
           command: |
-            if git diff --quiet HEAD~1 HEAD -- ecs/fizzy.taskdef.json; then
-              echo "Task definition unchanged, skipping registration..."
-            else
-              echo "Task definition changed, registering new revision..."
-              aws ecs register-task-definition \
-                --cli-input-json file://ecs/fizzy.taskdef.json \
-                --region eu-central-1
-            fi
-      - run:
-          name: Deploy to ECS
-          command: |
+            TASK_DEF_ARN=$(aws ecs register-task-definition \
+              --cli-input-json file://ecs/fizzy.taskdef.json \
+              --region eu-central-1 \
+              --query 'taskDefinition.taskDefinitionArn' \
+              --output text)
+            echo "Registered task definition: $TASK_DEF_ARN"
             aws ecs update-service \
               --cluster fizzy-ticketing \
               --service fizzy-service \
-              --task-definition fizzy-task \
+              --task-definition "$TASK_DEF_ARN" \
               --force-new-deployment \
               --region eu-central-1
 
