@@ -1,9 +1,20 @@
+<%
+  if (db_url = ENV["DATABASE_URL"]).present?
+    require "uri"
+    _uri = URI.parse(db_url)
+    _mysql_host     = _uri.host
+    _mysql_port     = _uri.port || 3306
+    _mysql_user     = _uri.user
+    _mysql_password = _uri.password
+    _mysql_database = _uri.path.delete_prefix("/")
+  end
+%>
 default: &default
   adapter: trilogy
-  host: <%= ENV.fetch("MYSQL_HOST", "127.0.0.1") %>
-  port: <%= ENV.fetch("MYSQL_PORT", "3306") %>
-  username: <%= ENV.fetch("MYSQL_USER", "root") %>
-  password: <%= ENV["MYSQL_PASSWORD"] %>
+  host: <%= _mysql_host || ENV.fetch("MYSQL_HOST", "127.0.0.1") %>
+  port: <%= _mysql_port || ENV.fetch("MYSQL_PORT", "3306") %>
+  username: <%= _mysql_user || ENV.fetch("MYSQL_USER", "root") %>
+  password: <%= _mysql_password || ENV["MYSQL_PASSWORD"] %>
   pool: 50
   ssl_mode: <%= ENV["MYSQL_SSL_MODE"] %>
   timeout: 5000

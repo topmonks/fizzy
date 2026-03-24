@@ -120,5 +120,5 @@ Rails.application.configure do
   config.active_record.dump_schema_after_migration = false
 
   # Skip DNS rebinding protection for the default health check endpoint.
-  # config.host_authorization = { exclude: ->(request) { request.path == "/up" } }
+  config.host_authorization = { exclude: ->(request) { request.path == "/up" } }
 end
