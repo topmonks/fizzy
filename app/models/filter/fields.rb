@@ -31,7 +31,7 @@ module Filter::Fields
 
   included do
     store_accessor :fields, :assignment_status, :indexed_by, :sorted_by, :terms,
-      :card_ids, :creation, :closure
+      :card_ids, :creation, :closure, :hours_status
 
     def assignment_status
       super.to_s.inquiry

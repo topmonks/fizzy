@@ -25,6 +25,9 @@ class Card < ApplicationRecord
   scope :with_users,              -> { preload(creator: [ :avatar_attachment, :account ], assignees: [ :avatar_attachment, :account ]) }
   scope :preloaded,               -> { with_users.preload(:column, :tags, :steps, :closure, :goldness, :activity_spike, :image_attachment, reactions: :reacter, board: [ :entropy, :columns ], not_now: [ :user ]).with_rich_text_description_and_embeds }
 
+  scope :hours_over,    -> { where("estimate_hours > 0 AND actual_hours > estimate_hours") }
+  scope :hours_warning, -> { where("estimate_hours > 0 AND actual_hours IS NOT NULL AND actual_hours <= estimate_hours AND (estimate_hours - actual_hours) / estimate_hours <= 0.25") }
+
   scope :indexed_by, ->(index) do
     case index
     when "stalled" then stalled

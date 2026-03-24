@@ -65,6 +65,10 @@ class User::Filtering
     filter.closers.any?
   end
 
+  def show_hours_status?
+    filter.hours_status.present?
+  end
+
   def show_boards?
     filter.boards.any?
   end

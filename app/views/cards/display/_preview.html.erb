@@ -31,6 +31,7 @@
           <span class="overflow-ellipsis "><%= card.column.name %></span>
         </span>
       <% end %>
+
     </header>
 
     <div class="card__body justify-space-between">
@@ -50,6 +51,20 @@
     <div class="card__counts">
       <%= render "cards/display/preview/boosts", card: card %>
       <%= render "cards/display/preview/comments", card: card %>
+      <% if card.estimate_hours.present? || card.actual_hours.present? %>
+        <% actual = card.actual_hours || 0
+           estimate = card.estimate_hours || 0
+           hours_status = if estimate > 0 && actual > estimate
+             "over"
+           elsif estimate > 0 && (estimate - actual).to_f / estimate <= 0.25
+             "warning"
+           else
+             "ok"
+           end %>
+        <span class="card__hours-preview card__hours--<%= hours_status %>">
+          Hours: <%= number_with_precision(actual, strip_insignificant_zeros: true) %> of <%= number_with_precision(estimate, strip_insignificant_zeros: true) %>
+        </span>
+      <% end %>
     </div>
     <%= render "cards/display/common/background", card: card %>
   </footer>

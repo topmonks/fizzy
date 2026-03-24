@@ -25,5 +25,16 @@
           data: { action: "lexxy:change->auto-save#change focusout->auto-save#submit" } do %>
       <%= general_prompts(card.board) %>
     <% end %>
+
+    <div class="card__hours">
+      <label class="card__hours-field">
+        <%= form.number_field :estimate_hours, placeholder: "Estimate (h)", min: 0, step: "any", class: "input",
+              data: { action: "input->auto-save#change blur->auto-save#submit" } %>
+      </label>
+      <label class="card__hours-field">
+        <%= form.number_field :actual_hours, placeholder: "Actual (h)", min: 0, step: "any", class: "input",
+              data: { action: "input->auto-save#change blur->auto-save#submit" } %>
+      </label>
+    </div>
   <% end %>
 <% end %>

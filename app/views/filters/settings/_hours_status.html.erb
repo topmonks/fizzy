@@ -1,0 +1,32 @@
+<% filter = user_filtering.filter %>
+
+<%= tag.div class: class_names("quick-filter"),
+      data: { controller: "dialog filter combobox",
+            action: "keydown.esc->dialog#close click@document->dialog#closeOnClickOutside dialog:close@document->filter#clearInput",
+            filter_show: user_filtering.show_hours_status?,
+            combobox_default_value_value: "",
+            combobox_default_label_value: "Estimate…",
+            combobox_with_default_class: "quick-filter--with-default" } do %>
+  <button type="button" class="btn input input--select flex-inline txt-x-small" data-action="click->dialog#toggle:stop">
+    <span class="overflow-ellipsis" data-combobox-target="label"><%= { "warning" => "Estimate: warning", "over" => "Estimate: over budget" }[filter.hours_status] || "Estimate…" %></span>
+  </button>
+
+  <template data-combobox-target="hiddenFieldTemplate">
+    <%= hidden_field_tag :hours_status, nil, data: { filter_settings_target: "field" } %>
+  </template>
+
+  <%= filter_dialog "Filter by hours…" do %>
+    <strong class="popup__title">Filter by hours…</strong>
+
+    <ul class="popup__list" data-filter-target="list" role="listbox">
+      <% [["warning", "Over budget warning (orange)"], ["over", "Over budget (red)"]].each do |value, label| %>
+        <%= tag.li class: "popup__item", data: { navigable_list_target: "item", combobox_target: "item", combobox_value: value, combobox_label: label }, role: "checkbox", aria: { checked: filter.hours_status == value } do %>
+          <button type="button" class="btn popup__btn" data-action="dialog#close combobox#change filter-settings#change form#submit">
+            <span class="overflow-ellipsis flex-item-grow"><%= label %></span>
+            <%= icon_tag "check", class: "checked flex-item-justify-end" %>
+          </button>
+        <% end %>
+      <% end %>
+    </ul>
+  <% end %>
+<% end %>

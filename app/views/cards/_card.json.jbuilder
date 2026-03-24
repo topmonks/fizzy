@@ -7,6 +7,9 @@ json.cache! card do
 
   json.tags card.tags.pluck(:title).sort
 
+  json.estimate_hours card.estimate_hours
+  json.actual_hours card.actual_hours
+
   json.closed card.closed?
   json.postponed card.postponed?
   json.golden card.golden?

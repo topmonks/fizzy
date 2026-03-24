@@ -7,6 +7,7 @@ module Filter::Params
     :sorted_by,
     :creation,
     :closure,
+    :hours_status,
     card_ids: [],
     assignee_ids: [],
     creator_ids: [],
@@ -43,7 +44,8 @@ module Filter::Params
   def used?(ignore_boards: false)
     tags.any? || assignees.any? || creators.any? || closers.any? ||
       terms.any? || card_ids&.any? || (!ignore_boards && boards.present?) ||
-      assignment_status.unassigned? || !indexed_by.all? || !sorted_by.latest?
+      assignment_status.unassigned? || !indexed_by.all? || !sorted_by.latest? ||
+      hours_status.present?
   end
 
   # +as_params+ uses `resource#ids` instead of `#resource_ids`
@@ -62,6 +64,7 @@ module Filter::Params
       params[:assignee_ids]      = assignees.ids
       params[:creator_ids]       = creators.ids
       params[:closer_ids]        = closers.ids
+      params[:hours_status]      = hours_status
     end.compact_blank.reject(&method(:default_value?))
   end
 

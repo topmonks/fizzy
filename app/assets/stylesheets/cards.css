@@ -581,3 +581,17 @@
     }
   }
 }
+
+.card__hours--display {
+  margin-block-start: 0.5em;
+  font-size: 0.9em;
+}
+
+.card__hours-preview {
+  font-size: 0.75em;
+  white-space: nowrap;
+}
+
+.card__hours--ok      { color: #4ade80; }
+.card__hours--warning { color: #fb923c; }
+.card__hours--over    { color: #f87171; }

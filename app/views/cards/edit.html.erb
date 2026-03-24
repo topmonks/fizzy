@@ -22,6 +22,15 @@
       <%= general_prompts(@card.board) %>
     <% end %>
 
+    <div class="card__hours">
+      <label class="card__hours-field">
+        <%= form.number_field :estimate_hours, placeholder: "Estimate (h)", min: 0, step: "any", class: "input" %>
+      </label>
+      <label class="card__hours-field">
+        <%= form.number_field :actual_hours, placeholder: "Actual (h)", min: 0, step: "any", class: "input" %>
+      </label>
+    </div>
+
     <%= link_to "Close editor and discard changes", @card,
           data: { form_target: "cancel", bridge__form_target: "cancel", bridge_title: "Cancel" }, hidden: true %>
   <% end %>
