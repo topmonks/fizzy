@@ -464,7 +464,7 @@ ActiveRecord::Schema[8.2].define(version: 2026_02_18_120000) do
     t.datetime "updated_at", null: false
     t.uuid "user_id", null: false
     t.index ["account_id"], name: "index_search_queries_on_account_id"
-    t.index ["user_id", "terms"], name: "index_search_queries_on_user_id_and_terms"
+    t.index ["user_id", "terms"], name: "index_search_queries_on_user_id_and_terms", length: { terms: 760 }
     t.index ["user_id", "updated_at"], name: "index_search_queries_on_user_id_and_updated_at", unique: true
     t.index ["user_id"], name: "index_search_queries_on_user_id"
   end
