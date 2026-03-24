@@ -42,10 +42,6 @@
           "valueFrom": "arn:aws:secretsmanager:eu-central-1:661884430919:secret:prod/fizzy:DATABASE_URL::"
         },
         {
-          "name": "RAILS_MASTER_KEY",
-          "valueFrom": "arn:aws:secretsmanager:eu-central-1:661884430919:secret:prod/fizzy:RAILS_MASTER_KEY::"
-        },
-        {
           "name": "SECRET_KEY_BASE",
           "valueFrom": "arn:aws:secretsmanager:eu-central-1:661884430919:secret:prod/fizzy:SECRET_KEY_BASE::"
         },
