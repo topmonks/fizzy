@@ -9,11 +9,19 @@ jobs:
       - image: cimg/ruby:3.4
     environment:
       RAILS_ENV: test
+      SAAS: "false"
+      BUNDLE_GEMFILE: Gemfile
       DATABASE_ADAPTER: sqlite
       BUNDLE_JOBS: "4"
       BUNDLE_RETRY: "3"
     steps:
       - checkout
+      - run:
+          name: Install system dependencies
+          command: |
+            sudo apt-get update -qq
+            sudo apt-get install -y libvips
+            curl -sSfL https://raw.githubusercontent.com/gitleaks/gitleaks/main/scripts/install.sh | sudo sh -s -- -b /usr/local/bin
       - restore_cache:
           keys:
             - gems-v1-{{ checksum "Gemfile.lock" }}
@@ -28,8 +36,26 @@ jobs:
           paths:
             - vendor/bundle
       - run:
-          name: Run CI suite
-          command: bin/ci
+          name: Prepare database
+          command: bin/rails db:prepare
+      - run:
+          name: Style - Rubocop
+          command: bin/rubocop
+      - run:
+          name: Security - Gem audit
+          command: bin/bundler-audit check --update
+      - run:
+          name: Security - Importmap audit
+          command: bin/importmap audit
+      - run:
+          name: Security - Brakeman
+          command: bin/brakeman --quiet --no-pager --exit-on-warn --exit-on-error
+      - run:
+          name: Security - Gitleaks
+          command: bin/gitleaks-audit
+      - run:
+          name: Tests
+          command: bin/rails test
 
   build-and-push:
     docker:
