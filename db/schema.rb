@@ -302,7 +302,7 @@ ActiveRecord::Schema[8.2].define(version: 2026_02_18_120000) do
     t.uuid "creator_id", null: false
     t.uuid "eventable_id", null: false
     t.string "eventable_type", null: false
-    t.json "particulars", default: {}
+    t.json "particulars"
     t.datetime "updated_at", null: false
     t.index ["account_id", "action"], name: "index_events_on_account_id_and_action"
     t.index ["board_id", "action", "created_at"], name: "index_events_on_board_id_and_action_and_created_at"
@@ -328,7 +328,7 @@ ActiveRecord::Schema[8.2].define(version: 2026_02_18_120000) do
     t.uuid "account_id", null: false
     t.datetime "created_at", null: false
     t.uuid "creator_id", null: false
-    t.json "fields", default: {}, null: false
+    t.json "fields", null: false
     t.string "params_digest", null: false
     t.datetime "updated_at", null: false
     t.index ["account_id"], name: "index_filters_on_account_id"
