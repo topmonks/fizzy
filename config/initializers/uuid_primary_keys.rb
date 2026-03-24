@@ -116,10 +116,14 @@ end
 module PostgreSQLUuidAdapter
   extend ActiveSupport::Concern
 
-  # Override lookup_cast_type so "uuid" SQL type uses our custom base36-aware type
+  POSTGRESQL_UUID_TYPE = ActiveRecord::Type::PostgreSQLUuid.new
+
+  # Override lookup_cast_type so "uuid" SQL type uses our custom base36-aware type.
+  # We return the instance directly instead of going through the registry to avoid
+  # TypeConflictError with Rails' own global :uuid registration.
   def lookup_cast_type(sql_type)
     if sql_type == "uuid"
-      ActiveRecord::Type.lookup(:uuid, adapter: :postgresql)
+      POSTGRESQL_UUID_TYPE
     else
       super
     end

@@ -69,4 +69,3 @@ end
 # Register the UUID type for Trilogy (MySQL), SQLite3, and PostgreSQL adapters
 ActiveRecord::Type.register(:uuid, ActiveRecord::Type::Uuid, adapter: :trilogy)
 ActiveRecord::Type.register(:uuid, ActiveRecord::Type::Uuid, adapter: :sqlite3)
-ActiveRecord::Type.register(:uuid, ActiveRecord::Type::PostgreSQLUuid, adapter: :postgresql, override: true)
