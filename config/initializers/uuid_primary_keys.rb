@@ -113,6 +113,19 @@ ActiveSupport.on_load(:active_record) do
   ActiveRecord::ConnectionAdapters::TableDefinition.prepend(TableDefinitionUuidSupport)
 end
 
+module PostgreSQLUuidAdapter
+  extend ActiveSupport::Concern
+
+  # Override lookup_cast_type so "uuid" SQL type uses our custom base36-aware type
+  def lookup_cast_type(sql_type)
+    if sql_type == "uuid"
+      ActiveRecord::Type.lookup(:uuid, adapter: :postgresql)
+    else
+      super
+    end
+  end
+end
+
 ActiveSupport.on_load(:active_record_trilogyadapter) do
   ActiveRecord::ConnectionAdapters::AbstractMysqlAdapter.prepend(MysqlUuidAdapter)
   ActiveRecord::ConnectionAdapters::MySQL::SchemaDumper.prepend(SchemaDumperUuidType)
@@ -121,4 +134,8 @@ end
 ActiveSupport.on_load(:active_record_sqlite3adapter) do
   ActiveRecord::ConnectionAdapters::SQLite3Adapter.prepend(SqliteUuidAdapter)
   ActiveRecord::ConnectionAdapters::SQLite3::SchemaDumper.prepend(SchemaDumperUuidType)
+end
+
+ActiveSupport.on_load(:active_record_postgresqladapter) do
+  ActiveRecord::ConnectionAdapters::PostgreSQLAdapter.prepend(PostgreSQLUuidAdapter)
 end
