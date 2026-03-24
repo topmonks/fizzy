@@ -97,6 +97,7 @@ jobs:
               --cluster fizzy-ticketing \
               --service fizzy-service \
               --task-definition "$TASK_DEF_ARN" \
+              --desired-count 1 \
               --force-new-deployment \
               --region eu-central-1
 
