@@ -8,14 +8,14 @@ if [ "${1}" == "./bin/thrust" ] && [ "${2}" == "./bin/rails" ] && [ "${3}" == "s
   # Load secondary schemas on first boot if their tables don't exist yet.
   ./bin/rails runner "
     conn = ActiveRecord::Base.connection
-    [
-      ['solid_queue_jobs',     'db:schema:load:queue'],
-      ['solid_cable_messages', 'db:schema:load:cable'],
-      ['solid_cache_entries',  'db:schema:load:cache'],
-    ].each do |table, task|
+    {
+      'solid_queue_jobs'     => 'db/queue_schema.rb',
+      'solid_cable_messages' => 'db/cable_schema.rb',
+      'solid_cache_entries'  => 'db/cache_schema.rb',
+    }.each do |table, schema_path|
       unless conn.table_exists?(table)
-        puts \"Loading schema for \#{task}...\"
-        system(\"bin/rails \#{task}\") or abort(\"Failed to load \#{task}\")
+        puts \"Loading \#{schema_path}...\"
+        load Rails.root.join(schema_path)
       end
     end
   "
