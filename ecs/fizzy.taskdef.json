@@ -31,7 +31,7 @@
         { "name": "RAILS_LOG_TO_STDOUT",    "value": "true" },
         { "name": "RAILS_SERVE_STATIC_FILES", "value": "true" },
         { "name": "SOLID_QUEUE_IN_PUMA",    "value": "true" },
-        { "name": "MULTI_TENANT",           "value": "false" },
+        { "name": "MULTI_TENANT",           "value": "true" },
         { "name": "BASE_URL",               "value": "https://fizzy.topmonks.com" },
         { "name": "MAILER_FROM_ADDRESS",    "value": "support@topmonks.com" },
         { "name": "SMTP_ADDRESS",           "value": "smtp.postmarkapp.com" },
