@@ -11,7 +11,9 @@ module WebhooksHelper
     card_reopened: "Card reopened",
     card_postponed: "Card moved to “Not Now”",
     card_auto_postponed: "Card moved to “Not Now” due to inactivity",
-    card_sent_back_to_triage: "Card moved back to “Maybe?”"
+    card_sent_back_to_triage: “Card moved back to “Maybe?””,
+    card_deleted: “Card deleted”,
+    card_description_changed: “Card description changed”
   }.with_indifferent_access.freeze
 
   def webhook_action_options(actions = Webhook::PERMITTED_ACTIONS)
