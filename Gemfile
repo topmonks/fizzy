@@ -39,6 +39,8 @@ gem "mittens"
 gem "useragent", bc: "useragent"
 
 # Operations
+gem "sentry-ruby"
+gem "sentry-rails"
 gem "autotuner"
 gem "mission_control-jobs"
 gem "stackprof"
