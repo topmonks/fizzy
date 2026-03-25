@@ -61,6 +61,9 @@ class Card < ApplicationRecord
           eventable: self, particulars: { particulars: { title: title, number: number } }
         )
         event.update_columns(eventable_type: "DeletedCard", eventable_id: id)
+        Rails.logger.info "[Card#delete] Created card_deleted event #{event.id} for card ##{number} (#{title})"
+      else
+        Rails.logger.info "[Card#delete] Skipped card_deleted event for card ##{number}: published?=#{published?}, Current.user=#{Current.user&.id}"
       end
       destroy!
     end
