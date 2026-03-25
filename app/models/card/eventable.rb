@@ -6,7 +6,7 @@ module Card::Eventable
   included do
     before_create { self.last_active_at ||= created_at || Time.current }
 
-    before_save -> { @description_changed = rich_text_description&.changed? }
+    before_save -> { @description_changed = rich_text_description&.body_changed? }
     after_save :track_title_change, if: :saved_change_to_title?
     after_save :track_description_change, if: -> { @description_changed }
   end
@@ -25,7 +25,7 @@ module Card::Eventable
 
   private
     def should_track_event?
-      published?
+      published? && Current.user.present?
     end
 
     def track_title_change
