@@ -29,7 +29,7 @@ module Card::Eventable
 
   private
     def should_track_event?
-      published?
+      published? && Current.user.present?
     end
 
     def track_title_change
@@ -40,7 +40,7 @@ module Card::Eventable
 
     def track_description_change
       @description_changed = false
-      track_event "description_changed" if Current.user
+      track_event "description_changed"
     end
 
     def create_system_comment_for(event)
