@@ -582,9 +582,14 @@
   }
 }
 
+.card__hours {
+  max-width: 25%;
+}
+
 .card__hours--display {
   margin-block-start: 0.5em;
   font-size: 0.9em;
+  white-space: nowrap;
 }
 
 .card__hours-preview {
