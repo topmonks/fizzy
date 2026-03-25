@@ -7,6 +7,7 @@ module Card::Eventable
     before_create { self.last_active_at ||= created_at || Time.current }
 
     after_save :track_title_change, if: :saved_change_to_title?
+    after_save :track_description_change, if: -> { rich_text_description.saved_changes? }
   end
 
   def event_was_created(event)
@@ -30,6 +31,10 @@ module Card::Eventable
       if title_before_last_save.present?
         track_event "title_changed", particulars: { old_title: title_before_last_save, new_title: title }
       end
+    end
+
+    def track_description_change
+      track_event "description_changed"
     end
 
     def create_system_comment_for(event)
