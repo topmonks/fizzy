@@ -7,13 +7,13 @@ module WebhooksHelper
     card_assigned: "Card assigned",
     card_unassigned: "Card unassigned",
     card_triaged: "Card column changed",
-    card_closed: "Card moved to “Done”",
+    card_closed: "Card moved to \u201CDone\u201D",
     card_reopened: "Card reopened",
-    card_postponed: "Card moved to “Not Now”",
-    card_auto_postponed: "Card moved to “Not Now” due to inactivity",
-    card_sent_back_to_triage: “Card moved back to “Maybe?””,
-    card_deleted: “Card deleted”,
-    card_description_changed: “Card description changed”
+    card_postponed: "Card moved to \u201CNot Now\u201D",
+    card_auto_postponed: "Card moved to \u201CNot Now\u201D due to inactivity",
+    card_sent_back_to_triage: "Card moved back to \u201CMaybe?\u201D",
+    card_deleted: "Card deleted",
+    card_description_changed: "Card description changed"
   }.with_indifferent_access.freeze
 
   def webhook_action_options(actions = Webhook::PERMITTED_ACTIONS)
