@@ -36,7 +36,8 @@
         { "name": "MAILER_FROM_ADDRESS",    "value": "support@topmonks.com" },
         { "name": "SMTP_ADDRESS",           "value": "smtp.postmarkapp.com" },
         { "name": "SMTP_PORT",             "value": "587" },
-        { "name": "SMTP_DOMAIN",           "value": "topmonks.com" }
+        { "name": "SMTP_DOMAIN",           "value": "topmonks.com" },
+        { "name": "SENTRY_DSN",            "value": "https://e4fbb30f10b77310bbfac4eae4afd74b@o4510708126056448.ingest.de.sentry.io/4511104128712784" }
       ],
       "secrets": [
         {
