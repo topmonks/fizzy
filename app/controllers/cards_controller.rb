@@ -42,7 +42,7 @@ class CardsController < ApplicationController
   end
 
   def destroy
-    @card.destroy!
+    @card.delete
 
     respond_to do |format|
       format.html { redirect_to @card.board, notice: "Card deleted" }

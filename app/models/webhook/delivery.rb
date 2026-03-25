@@ -162,9 +162,13 @@ class Webhook::Delivery < ApplicationRecord
 
     def slack_payload
       text = event.description_for(nil).to_plain_text
-      url = polymorphic_url(event.eventable, base_url_options.merge(script_name: account.slug))
 
-      { text: "#{text} <#{url}|Open in Fizzy>" }.to_json
+      if event.eventable
+        url = polymorphic_url(event.eventable, base_url_options.merge(script_name: account.slug))
+        { text: "#{text} <#{url}|Open in Fizzy>" }.to_json
+      else
+        { text: text }.to_json
+      end
     end
 
     def base_url_options

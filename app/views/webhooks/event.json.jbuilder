@@ -6,6 +6,11 @@ json.cache! @event do
     case @event.eventable
     when Card then json.partial! "cards/card", card: @event.eventable
     when Comment then json.partial! "cards/comments/comment", comment: @event.eventable
+    when nil
+      if @event.action.card_deleted?
+        json.title @event.particulars.dig("particulars", "title")
+        json.number @event.particulars.dig("particulars", "number")
+      end
     end
   end
 

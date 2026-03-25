@@ -46,7 +46,13 @@ class Event::Description
     end
 
     def card
-      @card ||= event.action.comment_created? ? event.eventable.card : event.eventable
+      @card ||= if event.action.comment_created?
+        event.eventable.card
+      elsif event.action.card_deleted?
+        OpenStruct.new(title: event.particulars.dig("particulars", "title"))
+      else
+        event.eventable
+      end
     end
 
     def comment_sentence(creator, card_title)
@@ -79,6 +85,8 @@ class Event::Description
         triaged_sentence(creator, card_title)
       when "card_sent_back_to_triage"
         %(#{creator} moved #{card_title} back to "Maybe?")
+      when "card_deleted"
+        "#{creator} deleted #{card_title}"
       end
     end
 

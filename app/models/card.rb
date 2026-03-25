@@ -53,6 +53,19 @@ class Card < ApplicationRecord
     self
   end
 
+  def delete
+    transaction do
+      if should_track_event?
+        event = board.events.create!(
+          action: "card_deleted", creator: Current.user, board: board,
+          eventable: self, particulars: { particulars: { title: title, number: number } }
+        )
+        event.update_columns(eventable_type: "DeletedCard", eventable_id: id)
+      end
+      destroy!
+    end
+  end
+
   def to_param
     number.to_s
   end

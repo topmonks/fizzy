@@ -4,7 +4,7 @@ class Event < ApplicationRecord
   belongs_to :account, default: -> { board.account }
   belongs_to :board
   belongs_to :creator, class_name: "User"
-  belongs_to :eventable, polymorphic: true
+  belongs_to :eventable, polymorphic: true, optional: true
 
   has_many :webhook_deliveries, class_name: "Webhook::Delivery", dependent: :delete_all
 
@@ -20,10 +20,14 @@ class Event < ApplicationRecord
     })
   }
 
-  after_create -> { eventable.event_was_created(self) }
+  after_create -> { eventable&.event_was_created(self) }
   after_create_commit :dispatch_webhooks
 
-  delegate :card, to: :eventable
+  delegate :card, to: :eventable, allow_nil: true
+
+  def eventable
+    super unless eventable_type == "DeletedCard"
+  end
 
   def action
     super.inquiry
