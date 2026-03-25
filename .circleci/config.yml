@@ -85,44 +85,22 @@ jobs:
       - checkout
       - aws-cli/setup
       - run:
-          name: Register task definition and deploy
+          name: Register task definition if changed
           command: |
-            FAMILY=$(jq -r '.family' ecs/fizzy.taskdef.json)
-
-            # Check if the latest task definition already matches our file
-            CURRENT_ARN=$(aws ecs describe-task-definition \
-              --task-definition "$FAMILY" \
-              --region eu-central-1 \
-              --query 'taskDefinition.taskDefinitionArn' \
-              --output text 2>/dev/null || echo "")
-
-            if [ -n "$CURRENT_ARN" ]; then
-              CURRENT_IMAGE=$(aws ecs describe-task-definition \
-                --task-definition "$FAMILY" \
-                --region eu-central-1 \
-                --query 'taskDefinition.containerDefinitions[0].image' \
-                --output text)
-              FILE_IMAGE=$(jq -r '.containerDefinitions[0].image' ecs/fizzy.taskdef.json)
-
-              if [ "$CURRENT_IMAGE" = "$FILE_IMAGE" ]; then
-                echo "Task definition unchanged, reusing $CURRENT_ARN"
-                TASK_DEF_ARN="$CURRENT_ARN"
-              fi
-            fi
-
-            if [ -z "$TASK_DEF_ARN" ]; then
-              TASK_DEF_ARN=$(aws ecs register-task-definition \
+            if git diff --quiet HEAD~1 HEAD -- ecs/fizzy.taskdef.json; then
+              echo "Task definition unchanged, skipping registration..."
+            else
+              echo "Task definition changed, registering new revision..."
+              aws ecs register-task-definition \
                 --cli-input-json file://ecs/fizzy.taskdef.json \
-                --region eu-central-1 \
-                --query 'taskDefinition.taskDefinitionArn' \
-                --output text)
-              echo "Registered new task definition: $TASK_DEF_ARN"
+                --region eu-central-1
             fi
-
+      - run:
+          name: Deploy to ECS
+          command: |
             aws ecs update-service \
               --cluster fizzy-ticketing \
               --service fizzy-service \
-              --task-definition "$TASK_DEF_ARN" \
               --desired-count 1 \
               --force-new-deployment \
               --region eu-central-1
